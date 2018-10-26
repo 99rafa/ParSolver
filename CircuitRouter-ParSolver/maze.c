@@ -281,7 +281,6 @@ bool_t maze_checkPaths (maze_t* mazePtr, list_t* pathVectorListPtr, FILE *fp, bo
     long height = gridPtr->height;
     long depth  = gridPtr->depth;
     long i;
-
     /* Mark walls */
     grid_t* testGridPtr = grid_alloc(width, height, depth);
     grid_addPath(testGridPtr, mazePtr->wallVectorPtr);
@@ -293,7 +292,6 @@ bool_t maze_checkPaths (maze_t* mazePtr, list_t* pathVectorListPtr, FILE *fp, bo
         coordinate_t* srcPtr = (coordinate_t*)vector_at(srcVectorPtr, i);
         grid_setPoint(testGridPtr, srcPtr->x, srcPtr->y, srcPtr->z, 0);
     }
-
     /* Mark destinations */
     vector_t* dstVectorPtr = mazePtr->dstVectorPtr;
     long numDst = vector_getSize(dstVectorPtr);
@@ -301,7 +299,6 @@ bool_t maze_checkPaths (maze_t* mazePtr, list_t* pathVectorListPtr, FILE *fp, bo
         coordinate_t* dstPtr = (coordinate_t*)vector_at(dstVectorPtr, i);
         grid_setPoint(testGridPtr, dstPtr->x, dstPtr->y, dstPtr->z, 0);
     }
-
     /* Make sure path is contiguous and does not overlap */
     long id = 0;
     list_iter_t it;

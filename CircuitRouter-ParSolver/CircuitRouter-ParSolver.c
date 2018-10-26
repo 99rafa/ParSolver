@@ -79,7 +79,7 @@ enum param_defaults {
     PARAM_DEFAULT_ZCOST    = 2,
 };
 
-int THREADS_MAX=0;
+long int THREADS_MAX=0;
 bool_t global_doPrint = TRUE;
 char* global_inputFile = NULL;
 long global_params[256]; /* 256 = ascii limit */
@@ -185,14 +185,18 @@ FILE * outputFile() {
 }
 
 void thread_create(router_solve_arg_t routerArg) {
-    pthread_t t;
-    if(pthread_create(&t,NULL,(void *)router_solve,(void *)&routerArg)!=0) {
-        fprintf(stderr, "Error: Thread Creation\n");
-        exit(1);
-    }
-    pthread_join(t,NULL);
+    pthread_t tid[THREADS_MAX];
+    for (int i=0; i<THREADS_MAX; i++) {
+	    if(pthread_create(&tid[i],NULL,(void *)router_solve,(void *)&routerArg)!=0) {
+	        fprintf(stderr, "Error: Thread Creation\n");
+	        exit(1);
+	    }
+   }
+    for (int j=0; j<THREADS_MAX; j++){
+		pthread_join (tid[j],NULL);
+	}
+	printf ("Terminaram todas as threads\n");
 }
-
 
 /* =============================================================================
  * main

@@ -299,14 +299,12 @@ void router_solve (void* argPtr){
     maze_t* mazePtr = routerArgPtr->mazePtr;
     vector_t* myPathVectorPtr = vector_alloc(1);
     assert(myPathVectorPtr);
-
     queue_t* workQueuePtr = mazePtr->workQueuePtr;
     grid_t* gridPtr = mazePtr->gridPtr;
     grid_t* myGridPtr = grid_alloc(gridPtr->width, gridPtr->height, gridPtr->depth);
     assert(myGridPtr);
     long bendCost = routerPtr->bendCost;
     queue_t* myExpansionQueuePtr = queue_alloc(-1);
-
     /*
      * Iterate over work list to route each path. This involves an
      * 'expansion' and 'traceback' phase for each source/destination pair.
