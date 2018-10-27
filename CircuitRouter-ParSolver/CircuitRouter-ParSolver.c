@@ -79,10 +79,11 @@ enum param_defaults {
     PARAM_DEFAULT_ZCOST    = 2,
 };
 
-long int THREADS_MAX=0;
+unsigned long int THREADS_MAX=0;
 bool_t global_doPrint = TRUE;
 char* global_inputFile = NULL;
 long global_params[256]; /* 256 = ascii limit */
+
 
 
 /* =============================================================================
@@ -186,13 +187,18 @@ FILE * outputFile() {
 
 void thread_create(router_solve_arg_t routerArg) {
     pthread_t tid[THREADS_MAX];
+    if (pthread_mutex_init(&semExtMut, NULL) != 0)
+    {
+        printf("\n mutex init failed\n");
+        exit(1);
+    }
     for (int i=0; i<THREADS_MAX; i++) {
 	    if(pthread_create(&tid[i],NULL,(void *)router_solve,(void *)&routerArg)!=0) {
 	        fprintf(stderr, "Error: Thread Creation\n");
 	        exit(1);
 	    }
    }
-    for (int j=0; j<THREADS_MAX; j++){
+    for (int j=0; j<THREADS_MAX; j++){   /* page 195- SO book */
 		pthread_join (tid[j],NULL);
 	}
 	printf ("Terminaram todas as threads\n");

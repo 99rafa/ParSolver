@@ -73,6 +73,8 @@ typedef struct router_solve_arg {
 } router_solve_arg_t;
 
 
+extern pthread_mutex_t semExtMut;
+
 /* =============================================================================
  * router_alloc
  * =============================================================================

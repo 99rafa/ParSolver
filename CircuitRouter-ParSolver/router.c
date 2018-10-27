@@ -53,6 +53,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "coordinate.h"
 #include "grid.h"
 #include "lib/queue.h"
@@ -84,7 +85,7 @@ point_t MOVE_POSZ = { 0,  0,  1,  0, MOMENTUM_POSZ};
 point_t MOVE_NEGX = {-1,  0,  0,  0, MOMENTUM_NEGX};
 point_t MOVE_NEGY = { 0, -1,  0,  0, MOMENTUM_NEGY};
 point_t MOVE_NEGZ = { 0,  0, -1,  0, MOMENTUM_NEGZ};
-
+pthread_mutex_t semExtMut/*=PTHREAD_MUTEX_INITIALIZER*/;
 
 /* =============================================================================
  * router_alloc
@@ -293,7 +294,7 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
  * =============================================================================
  */
 void router_solve (void* argPtr){
-
+    pthread_mutex_lock(&semExtMut);
     router_solve_arg_t* routerArgPtr = (router_solve_arg_t*)argPtr;
     router_t* routerPtr = routerArgPtr->routerPtr;
     maze_t* mazePtr = routerArgPtr->mazePtr;
@@ -305,6 +306,7 @@ void router_solve (void* argPtr){
     assert(myGridPtr);
     long bendCost = routerPtr->bendCost;
     queue_t* myExpansionQueuePtr = queue_alloc(-1);
+
     /*
      * Iterate over work list to route each path. This involves an
      * 'expansion' and 'traceback' phase for each source/destination pair.
@@ -344,9 +346,7 @@ void router_solve (void* argPtr){
             bool_t status = vector_pushBack(myPathVectorPtr,(void*)pointVectorPtr);
             assert(status);
         }
-
     }
-
     /*
      * Add my paths to global list
      */
@@ -355,6 +355,7 @@ void router_solve (void* argPtr){
 
     grid_free(myGridPtr);
     queue_free(myExpansionQueuePtr);
+    pthread_mutex_unlock(&semExtMut);
 }
 
 
