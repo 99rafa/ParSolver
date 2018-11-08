@@ -187,11 +187,6 @@ FILE * outputFile() {
 
 void thread_create(router_solve_arg_t routerArg) {
     pthread_t tid[THREADS_MAX];
-    if (pthread_mutex_init(&semExtMut, NULL) != 0)
-    {
-        printf("\n mutex init failed\n");
-        exit(1);
-    }
     for (int i=0; i<THREADS_MAX; i++) {
 	    if(pthread_create(&tid[i],NULL,(void *)router_solve,(void *)&routerArg)!=0) {
 	        fprintf(stderr, "Error: Thread Creation\n");
@@ -199,8 +194,11 @@ void thread_create(router_solve_arg_t routerArg) {
 	    }
    }
     for (int j=0; j<THREADS_MAX; j++){   /* page 195- SO book */
-		pthread_join (tid[j],NULL);
-	}
+		if((pthread_join (tid[j],NULL))!=0) {
+            fprintf(stderr, "Error: Thread not joint\n" );
+            exit(1);
+	   }
+    }
 	printf ("Terminaram todas as threads\n");
 }
 
@@ -220,11 +218,10 @@ int main(int argc, char** argv){
     router_t* routerPtr = router_alloc(global_params[PARAM_XCOST],
                                        global_params[PARAM_YCOST],
                                        global_params[PARAM_ZCOST],
-                                       global_params[PARAM_BENDCOST]);
+                                       global_params[PARAM_BENDCOST]);  
     assert(routerPtr);
     list_t* pathVectorListPtr = list_alloc(NULL);
     assert(pathVectorListPtr);
-
     router_solve_arg_t routerArg = {routerPtr, mazePtr, pathVectorListPtr};
     TIMER_T startTime;
     TIMER_READ(startTime);
@@ -233,7 +230,6 @@ int main(int argc, char** argv){
 
     TIMER_T stopTime;
     TIMER_READ(stopTime);
-
     long numPathRouted = 0;
     list_iter_t it;
     list_iter_reset(&it, pathVectorListPtr);
@@ -252,7 +248,6 @@ int main(int argc, char** argv){
     bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, resultFp, global_doPrint);
     assert(status == TRUE);  /* error in this assertion*/
     fputs("Verification passed.\n",resultFp);
-
     maze_free(mazePtr);
     router_free(routerPtr);
 
@@ -267,7 +262,6 @@ int main(int argc, char** argv){
         vector_free(pathVectorPtr);
     }
     list_free(pathVectorListPtr);
-
     fclose(resultFp);
     exit(0);
 }

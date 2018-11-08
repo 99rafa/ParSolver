@@ -62,6 +62,7 @@
 #include "lib/pair.h"
 #include "lib/types.h"
 #include "lib/vector.h"
+#include <pthread.h>
 
 
 /* =============================================================================
@@ -169,7 +170,6 @@ long maze_read (maze_t* mazePtr, char * input, FILE * fp){
     vector_t* wallVectorPtr = mazePtr->wallVectorPtr;
     vector_t* srcVectorPtr = mazePtr->srcVectorPtr;
     vector_t* dstVectorPtr = mazePtr->dstVectorPtr;
-    
     while (fgets(line, sizeof(line), inputFile)) {
         
         char code;
@@ -183,7 +183,6 @@ long maze_read (maze_t* mazePtr, char * input, FILE * fp){
         if (numToken < 1) {
             continue;
         }
-        
         switch (code) {
             case '#': { /* comment */
                 /* ignore line */

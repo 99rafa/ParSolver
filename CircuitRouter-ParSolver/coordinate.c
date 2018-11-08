@@ -58,6 +58,9 @@
 #include "lib/pair.h"
 #include "lib/types.h"
 
+static long index_couter=0;
+pthread_mutex_t *mutex_array;   
+
 
 /* =============================================================================
  * coordinate_alloc

@@ -63,6 +63,8 @@
 #include "lib/types.h"
 #include "lib/vector.h"
 
+
+
 typedef struct maze {
     grid_t* gridPtr;
     queue_t* workQueuePtr;   /* contains source/destination pairs to route */

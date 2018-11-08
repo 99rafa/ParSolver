@@ -58,6 +58,8 @@
 #include "lib/types.h"
 #include "lib/vector.h"
 
+extern pthread_mutex_t *mutex_array;
+
 
 typedef struct grid {
     long width;
