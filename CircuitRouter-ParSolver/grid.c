@@ -62,12 +62,12 @@
 #include "lib/types.h"
 #include "lib/vector.h"
 #include <pthread.h>
+#include "parallelism.h"
 
 
 const unsigned long CACHE_LINE_SIZE = 32UL;
-static long index_couter=0;
-pthread_mutex_t *mutex_array;
-static int first_call=0;
+
+
 
 /* =============================================================================
  * grid_alloc
@@ -80,12 +80,8 @@ grid_t* grid_alloc (long width, long height, long depth){
         gridPtr->width  = width;
         gridPtr->height = height;
         gridPtr->depth  = depth;
-        long n = width * height * depth;
-        long* points_unaligned = (long*)malloc(n * sizeof(long) + CACHE_LINE_SIZE);
-        if (!first_call) {
-            mutex_array= malloc(sizeof(pthread_mutex_t)*n);
-            first_call=1;
-        }
+        long n = width * height * depth;   
+        long* points_unaligned = (long*)malloc(n        * sizeof(long) + CACHE_LINE_SIZE);
         assert(points_unaligned);
         gridPtr->points_unaligned = points_unaligned;
         gridPtr->points = (long*)((char*)(((unsigned long)points_unaligned
@@ -112,7 +108,7 @@ void grid_free (grid_t* gridPtr){
  * =============================================================================
  */
 void grid_copy (grid_t* dstGridPtr, grid_t* srcGridPtr){
-    
+
     assert(srcGridPtr->width  == dstGridPtr->width);
     assert(srcGridPtr->height == dstGridPtr->height);
     assert(srcGridPtr->depth  == dstGridPtr->depth);
@@ -214,10 +210,12 @@ void grid_addPath (grid_t* gridPtr, vector_t* pointVectorPtr){
     for (i = 0; i < n; i++) {
 
         coordinate_t* coordinatePtr = (coordinate_t*)vector_at(pointVectorPtr, i);
-        long x = coordinatePtr->x;
-        long y = coordinatePtr->y;
-        long z = coordinatePtr->z;
-        grid_setPoint(gridPtr, x, y, z, GRID_POINT_FULL);
+        
+                long x = coordinatePtr->x;
+                long y = coordinatePtr->y;
+                long z = coordinatePtr->z;
+                grid_setPoint(gridPtr, x, y, z, GRID_POINT_FULL);
+
         
     }
 }

@@ -57,12 +57,15 @@
 
 #include "lib/types.h"
 
+
 typedef struct coordinate {
     long x;
     long y;
     long z;
+    pthread_mutex_t mutex;
 } coordinate_t;
 
+extern coordinate_t *mutex_array;
 
 /* =============================================================================
  * coordinate_alloc

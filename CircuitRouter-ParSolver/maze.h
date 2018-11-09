@@ -63,7 +63,7 @@
 #include "lib/types.h"
 #include "lib/vector.h"
 
-
+extern long n_coordinates;
 
 typedef struct maze {
     grid_t* gridPtr;

@@ -54,7 +54,7 @@
 #ifndef ROUTER_H
 #define ROUTER_H 1
 
-
+#include "coordinate.h"
 #include "grid.h"
 #include "maze.h"
 #include "lib/vector.h"
@@ -73,7 +73,7 @@ typedef struct router_solve_arg {
 } router_solve_arg_t;
 
 
-extern pthread_mutex_t semExtMut;
+
 
 /* =============================================================================
  * router_alloc

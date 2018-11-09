@@ -57,8 +57,9 @@
 #include <stdio.h>
 #include "lib/types.h"
 #include "lib/vector.h"
+#include "parallelism.h"
+#include "coordinate.h"
 
-extern pthread_mutex_t *mutex_array;
 
 
 typedef struct grid {

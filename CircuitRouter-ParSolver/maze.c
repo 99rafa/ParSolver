@@ -64,6 +64,7 @@
 #include "lib/vector.h"
 #include <pthread.h>
 
+long n_coordinates;
 
 /* =============================================================================
  * maze_alloc
@@ -195,6 +196,7 @@ long maze_read (maze_t* mazePtr, char * input, FILE * fp){
                 width  = x1;
                 height = y1;
                 depth  = z1;
+                n_coordinates=x1*y1*z1;
                 if (width < 1 || height < 1 || depth < 1) {
                     goto PARSE_ERROR;
                 }

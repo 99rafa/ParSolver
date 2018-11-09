@@ -57,10 +57,12 @@
 #include "coordinate.h"
 #include "lib/pair.h"
 #include "lib/types.h"
+#include <pthread.h>
+#include "maze.h"
 
-static long index_couter=0;
-pthread_mutex_t *mutex_array;   
-
+static long index_number=0;
+coordinate_t *mutex_array;
+int first_entry=1;
 
 /* =============================================================================
  * coordinate_alloc
@@ -68,14 +70,20 @@ pthread_mutex_t *mutex_array;
  */
 coordinate_t* coordinate_alloc (long x, long y, long z){
     coordinate_t* coordinatePtr;
-
+    if (first_entry) { 
+            mutex_array=create_mutex_array( n_coordinates );
+            first_entry=0;
+        }
     coordinatePtr = (coordinate_t*)malloc(sizeof(coordinate_t));
     if (coordinatePtr) {
         coordinatePtr->x = x;
         coordinatePtr->y = y;
         coordinatePtr->z = z;
-    }
-
+        mutex_array[index_number].x=x;
+		mutex_array[index_number].y=y;
+		mutex_array[index_number].z=z;
+		index_number++;
+	}
     return coordinatePtr;
 }
 

@@ -52,6 +52,7 @@
 
 
 #include <stdlib.h>
+#include "coordinate.h"
 #include <stdio.h>
 #include <pthread.h>
 #include <assert.h>
@@ -64,6 +65,7 @@
 #include "router.h"
 #include "lib/timer.h"
 #include "lib/types.h"
+
 
 enum param_types {
     PARAM_BENDCOST = (unsigned char)'b',
@@ -187,6 +189,7 @@ FILE * outputFile() {
 
 void thread_create(router_solve_arg_t routerArg) {
     pthread_t tid[THREADS_MAX];
+
     for (int i=0; i<THREADS_MAX; i++) {
 	    if(pthread_create(&tid[i],NULL,(void *)router_solve,(void *)&routerArg)!=0) {
 	        fprintf(stderr, "Error: Thread Creation\n");
