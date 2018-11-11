@@ -66,7 +66,8 @@
 
 
 const unsigned long CACHE_LINE_SIZE = 32UL;
-
+pthread_mutex_t *mutex_array;
+int first_entry=1;
 
 
 /* =============================================================================
@@ -81,7 +82,11 @@ grid_t* grid_alloc (long width, long height, long depth){
         gridPtr->height = height;
         gridPtr->depth  = depth;
         long n = width * height * depth;   
-        long* points_unaligned = (long*)malloc(n        * sizeof(long) + CACHE_LINE_SIZE);
+             if (first_entry) { 
+             mutex_array=create_mutex_array(n);
+             first_entry=0;
+         }
+        long* points_unaligned = (long*)malloc(n* sizeof(long) + CACHE_LINE_SIZE);
         assert(points_unaligned);
         gridPtr->points_unaligned = points_unaligned;
         gridPtr->points = (long*)((char*)(((unsigned long)points_unaligned
@@ -108,7 +113,6 @@ void grid_free (grid_t* gridPtr){
  * =============================================================================
  */
 void grid_copy (grid_t* dstGridPtr, grid_t* srcGridPtr){
-
     assert(srcGridPtr->width  == dstGridPtr->width);
     assert(srcGridPtr->height == dstGridPtr->height);
     assert(srcGridPtr->depth  == dstGridPtr->depth);
@@ -208,15 +212,13 @@ void grid_addPath (grid_t* gridPtr, vector_t* pointVectorPtr){
     long i;
     long n = vector_getSize(pointVectorPtr);
     for (i = 0; i < n; i++) {
-
         coordinate_t* coordinatePtr = (coordinate_t*)vector_at(pointVectorPtr, i);
-        
                 long x = coordinatePtr->x;
                 long y = coordinatePtr->y;
                 long z = coordinatePtr->z;
                 grid_setPoint(gridPtr, x, y, z, GRID_POINT_FULL);
 
-        
+
     }
 }
 
@@ -225,13 +227,42 @@ void grid_addPath (grid_t* gridPtr, vector_t* pointVectorPtr){
  * grid_addPath_Ptr
  * =============================================================================
  */
-void grid_addPath_Ptr (grid_t* gridPtr, vector_t* pointVectorPtr){
+int grid_addPath_Ptr (grid_t* gridPtr, vector_t* pointVectorPtr){
     long i;
+    long j;
+    long x;
+    long y;
+    long z;
+    long index;
     long n = vector_getSize(pointVectorPtr);
     for (i = 1; i < (n-1); i++) {
         long* gridPointPtr = (long*)vector_at(pointVectorPtr, i);
-        *gridPointPtr = GRID_POINT_FULL; 
+        grid_getPointIndices(gridPtr,gridPointPtr, &x,&y,&z);
+        index=(z * gridPtr->height + y) * gridPtr->width + x; /* sort of algorithm to get a different index for each coordinate*/
+        if (pthread_mutex_init(&mutex_array[index], NULL) != 0)
+        {
+            printf("\n mutex init failed\n");
+            exit(1);
+        }
+        if(pthread_mutex_lock(&mutex_array[index])!=0) {
+            printf("\n mutex lock failed\n");
+            exit(1);
+        }
+        if ( *gridPointPtr == GRID_POINT_EMPTY ) 
+            *gridPointPtr = GRID_POINT_FULL;
+        else {
+            for (j = 1; j < i; j++) {
+                 long* PointPtr = (long*)vector_at(pointVectorPtr, j);
+                *PointPtr = GRID_POINT_EMPTY;
+            }
+            return 0;      
+        }
+        if(pthread_mutex_unlock(&mutex_array[index])!=0) {
+            printf("\n mutex unlock failed\n");
+            exit(1);
+        }
     }
+    return 1;
 }
 
 
